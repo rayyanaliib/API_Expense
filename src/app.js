@@ -3,6 +3,7 @@ import transactionRoutes from './routes/transactionRoutes.js';
 import cors from 'cors';
 import authRoutes from './routes/authRoutes.js';
 import{ authenticateToken } from './middleware/authMiddleware.js';
+import categoryRoutes from './routes/transactionRoutes.js'; 
 
 const app = express();
 
@@ -20,6 +21,9 @@ app.use('/api/auth', authRoutes)
 
 // Route untuk endpoint API pengeluaran
 app.use('/api/transactions', transactionRoutes);
+
+// Gunakan rute kategori
+app.use('/api', categoryRoutes);  // Prefix '/api' untuk semua rute kategori
 
 // Route untuk root path
 app.get('/', (req, res) => {

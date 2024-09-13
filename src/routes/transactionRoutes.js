@@ -1,5 +1,5 @@
 import express from 'express';
-import { getTransaction, getTransactionById, createTransaction, updateTransaction, deleteTransaction, getTotalPengeluaran } from '../controllers/transactionController.js';
+import { getTransaction, getTransactionById, createTransaction, updateTransaction, deleteTransaction, getTotalPengeluaran, createCategory, deleteCategory, getCategories, updateTransactionStatus } from '../controllers/transactionController.js';
 import { authenticateToken } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
@@ -24,5 +24,16 @@ router.put('/:id', updateTransaction);
 
 // Rute untuk menghapus pengeluaran berdasarkan ID
 router.delete('/:id', deleteTransaction);
+
+// Rute untuk mendapatkan semua kategori 
+router.get('/categories', getCategories);
+
+// Rute untuk menambah kategori
+router.post('/categories', createCategory);
+
+// Rute untuk menghapus kategori berdasarkan id
+router.delete('/categories/:id', deleteCategory);
+
+router.patch('/transactions/:id/status', updateTransactionStatus);
 
 export default router;

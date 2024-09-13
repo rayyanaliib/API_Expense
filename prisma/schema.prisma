@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,32 +7,63 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// Enum untuk jenis transaksi (operasional, non-operasional, prive)
+enum TransactionType {
+  OPERASIONAL
+  NON_OPERASIONAL
+  PRIVE
+}
+
+// Enum untuk status transaksi
+enum TransactionStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+// Enum untuk tipe kategori (operasional, non-operasional, prive)
+enum CategoryType {
+  OPERASIONAL
+  NON_OPERASIONAL
+  PRIVE
+}
+
 model User {
-  id        Int      @id @default(autoincrement())
-  username  String   @unique
-  name      String   
-  password  String
-  role      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          Int          @id @default(autoincrement())
+  username    String       @unique
+  name        String
+  password    String
+  role        String
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
   transactions Transaction[]
 }
 
 model Transaction {
-  id            Int          @id @default(autoincrement())
+  id            Int              @id @default(autoincrement())
   title         String
-  date          Date
-  type          String
-  category      String
+  date          DateTime
+  type          TransactionType  // Menggunakan enum untuk tipe transaksi
   description   String?
-  reporterName  String        // Nama user yang login dan mencatat transaksi
-  reporterRole  String        // Role user yang login dan mencatat transaksi
+  reporterName  String            // Nama user yang login dan mencatat transaksi
+  reporterRole  String            // Role user yang login dan mencatat transaksi
   cost          Float
-  imageUrl      String?       // URL dari gambar yang diunggah (opsional)
+  status        TransactionStatus @default(PENDING)  // Status pengeluaran
+  remarks       String?                           // Catatan bendahara
+  imageUrl      String?           // URL dari gambar yang diunggah (opsional)
   userId        Int
-  user          User          @relation(fields: [userId], references: [id])
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+  user          User              @relation(fields: [userId], references: [id])
+  categoryId    Int               // Relasi ke kategori
+  category      Category          @relation(fields: [categoryId], references: [id])
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
 }
 
-
+model Category {
+  id           Int            @id @default(autoincrement())
+  name         String         @unique   // Pastikan nama kategori unik
+  type         CategoryType             // Gunakan enum untuk tipe kategori
+  transactions Transaction[]            // Relasi ke transaksi
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+}

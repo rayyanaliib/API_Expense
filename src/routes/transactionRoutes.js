@@ -36,4 +36,6 @@ router.delete('/categories/:id', deleteCategory);
 
 router.patch('/transactions/:id/status', updateTransactionStatus);
 
+router.get('/reports/pending', getPendingReports);
+
 export default router;

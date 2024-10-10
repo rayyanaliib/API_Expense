@@ -163,60 +163,6 @@ export const getTotalPengeluaran = async (req, res) => {
     }
 };
 
-// Kategori: Mendapatkan semua kategori
-export const getCategories = async (req, res) => {
-    try {
-        const categories = await prisma.category.findMany();
-        res.json(categories);
-    } catch (error) {
-        console.error('Error mendapatkan kategori:', error);
-        res.status(500).json({ error: 'Terjadi kesalahan saat mendapatkan kategori' });
-    }
-};
-
-// Kategori: Menambah kategori
-export const createCategory = async (req, res) => {
-    const { name, type } = req.body;
-  
-    try {
-      // Cek apakah kategori sudah ada
-      const existingCategory = await prisma.category.findUnique({
-        where: { name },
-      });
-  
-      if (existingCategory) {
-        return res.status(400).json({ error: 'Kategori sudah ada' });
-      }
-  
-      // Jika belum ada, tambahkan kategori baru
-      const newCategory = await prisma.category.create({
-        data: {
-          name,
-          type,
-        },
-      });
-  
-      res.status(201).json(newCategory);
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-  };
-  
-
-// Kategori: Menghapus kategori
-export const deleteCategory = async (req, res) => {
-    const { id } = req.params;
-    try {
-        await prisma.category.delete({
-            where: { id: parseInt(id, 10) },
-        });
-        res.json({ message: 'Kategori dihapus' });
-    } catch (error) {
-        console.error('Error menghapus kategori:', error);
-        res.status(500).json({ error: 'Terjadi kesalahan saat menghapus kategori' });
-    }
-};
-
 // Mendapatkan semua laporan (bendahara melihat laporan masuk)
 export const getReports = async (req, res) => {
     try {
@@ -264,28 +210,53 @@ export const rejectReport = async (req, res) => {
     }
 };
 
-// Mengubah status transaksi menjadi "APPROVED" atau "REJECTED"
+// Mengubah status transaksi menjadi "APPROVED" atau "REJECTED" beserta keterangan
 export const updateTransactionStatus = async (req, res) => {
-    const { id } = req.params;
-    const { status, remarks } = req.body;
-  
-    // Pastikan status yang dikirim valid ("APPROVED" atau "REJECTED")
+    const { id } = req.params;  // Mengambil ID laporan dari parameter URL
+    const { status, remarks } = req.body;  // Mengambil status dan remarks dari body request
+
+    // Validasi status yang dikirim harus "APPROVED" atau "REJECTED"
     if (status !== 'APPROVED' && status !== 'REJECTED') {
-      return res.status(400).json({ error: 'Status tidak valid. Gunakan "APPROVED" atau "REJECTED".' });
+        return res.status(400).json({ error: 'Status tidak valid. Gunakan "APPROVED" atau "REJECTED".' });
     }
-  
+
+    // Validasi jika status "REJECTED", maka remarks wajib diisi
+    if (status === 'REJECTED' && !remarks) {
+        return res.status(400).json({ error: 'Keterangan wajib diisi jika laporan ditolak.' });
+    }
+
     try {
-      // Cari transaksi berdasarkan ID dan ubah statusnya
-      const updatedTransaction = await prisma.transaction.update({
-        where: { id: Number(id) },
-        data: {
-          status,
-          remarks,  // Optional, tambahkan catatan jika ada
-        },
-      });
-  
-      res.status(200).json(updatedTransaction);
+        // Cari transaksi berdasarkan ID dan ubah statusnya beserta keterangan (remarks)
+        const updatedTransaction = await prisma.transaction.update({
+            where: { id: Number(id) },
+            data: {
+                status,
+                remarks: remarks || null,  // Jika ada remarks, tambahkan. Jika tidak ada, biarkan null
+            },
+        });
+
+        res.status(200).json(updatedTransaction);  // Mengirimkan data transaksi yang diperbarui
     } catch (error) {
-      res.status(500).json({ error: error.message });
+        console.error('Error memperbarui status transaksi:', error);
+        res.status(500).json({ error: error.message });
     }
-  };
+};
+
+
+
+  // Controller untuk mendapatkan semua laporan dengan status pending
+  export const getPendingReports = async (req, res) => {
+    try {
+        const pendingTransactions = await prisma.transaction.findMany({
+            where: { status: 'Pending' }, // Filter berdasarkan status
+        });
+
+        // Mengembalikan laporan yang masih pending
+        res.status(200).json(pendingTransactions);
+    } catch (error) {
+        console.error('Error mendapatkan laporan:', error);
+        res.status(500).json({ error: 'Terjadi kesalahan saat mendapatkan laporan' });
+    }
+};
+
+

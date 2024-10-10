@@ -21,13 +21,6 @@ enum TransactionStatus {
   REJECTED
 }
 
-// Enum untuk tipe kategori (operasional, non-operasional, prive)
-enum CategoryType {
-  OPERASIONAL
-  NON_OPERASIONAL
-  PRIVE
-}
-
 model User {
   id          Int          @id @default(autoincrement())
   username    String       @unique

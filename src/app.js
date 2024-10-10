@@ -4,6 +4,7 @@ import cors from 'cors';
 import authRoutes from './routes/authRoutes.js';
 import{ authenticateToken } from './middleware/authMiddleware.js';
 import categoryRoutes from './routes/transactionRoutes.js'; 
+import categoryRoutes from './routes/categoryRoutes.js';
 
 const app = express();
 

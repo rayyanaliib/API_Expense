@@ -1,5 +1,6 @@
 import express from 'express';
-import { getTransaction, getTransactionById, createTransaction, updateTransaction, deleteTransaction, getTotalPengeluaran, createCategory, deleteCategory, getCategories, updateTransactionStatus } from '../controllers/transactionController.js';
+import { getTransaction, getTransactionById, createTransaction, updateTransaction, deleteTransaction, getTotalPengeluaran, updateTransactionStatus, getPendingReports } from '../controllers/transactionController.js';
+import{ createCategory, deleteCategory, getCategories } from '../controllers/categoryController.js';
 import { authenticateToken } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
